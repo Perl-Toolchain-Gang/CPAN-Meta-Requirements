@@ -1,5 +1,6 @@
 Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
-    -
+
+    - Split out from CPAN::Meta into own distribution
 
