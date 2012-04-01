@@ -1,0 +1,73 @@
+{
+   "abstract" : "a set of version requirements for a CPAN dist",
+   "author" : [
+      "David Golden <dagolden@cpan.org>",
+      "Ricardo Signes <rjbs@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300013, CPAN::Meta::Converter version 2.120920",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Meta-Requirements",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "version" : "0.77",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Meta::Requirements" : {
+         "file" : "lib/CPAN/Meta/Requirements.pm",
+         "version" : "2.121"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-cpan-meta-requirements at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Meta-Requirements"
+      },
+      "homepage" : "https://github.com/dagolden/cpan-meta-requirements",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/cpan-meta-requirements.git",
+         "web" : "https://github.com/dagolden/cpan-meta-requirements"
+      }
+   },
+   "version" : "2.121"
+}
+
