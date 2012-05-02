@@ -407,13 +407,13 @@ L<CPAN::Meta::Spec/Version Ranges>. For example:
 
 =item == 1.3
 
-=item ! 1.3
+=item != 1.3
 
 =item > 1.3
 
 =item < 1.3
 
-=item >= 1.3, ! 1.5, <= 2.0
+=item >= 1.3, != 1.5, <= 2.0
 
 A version number without an operator is equivalent to specifying a minimum
 (C<E<gt>=>).  Extra whitespace is allowed.
