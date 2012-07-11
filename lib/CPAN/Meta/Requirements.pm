@@ -330,7 +330,7 @@ This returns a string containing the version requirements for a given module in
 the format described in L<CPAN::Meta::Spec> or undef if the given module has no
 requirements. This should only be used for informational purposes such as error
 messages and should not be interpreted or used for comparison (see
-L</accepts_module> instead.)
+L</accepts_module> instead).
 
 =cut
 
@@ -346,9 +346,8 @@ sub requirements_for_module {
   $req->structured_requirements_for_module( $module );
 
 This returns a data structure containing the version requirements for a given
-module or undef if the given module has no requirements.  This should only be
-used for informational purposes such as error messages and should not be
-interpreted or used for comparison (see L</accepts_module> instead.)
+module or undef if the given module has no requirements.  This should 
+not be used for version checks (see L</accepts_module> instead).
 
 =cut
 
