@@ -666,11 +666,11 @@ sub from_string_hash {
 
     my @parts;
 
-    for my $pair (
+    for my $tuple (
       [ qw( >= > minimum ) ],
       [ qw( <= < maximum ) ],
     ) {
-      my ($op, $e_op, $k) = @$pair;
+      my ($op, $e_op, $k) = @$tuple;
       if (exists $self->{$k}) {
         my @new_exclusions = grep { $_ != $self->{ $k } } @exclusions;
         if (@new_exclusions == @exclusions) {
