@@ -194,8 +194,8 @@ sub dies_ok (&@) {
     # remember, it's okay to change the exact results, as long as the meaning
     # is unchanged -- rjbs, 2012-07-11
     [
-      [ '<=', '3' ],
       [ '>=', '1' ],
+      [ '<=', '3' ],
       [ '!=', '2' ],
     ],
     "structured requirements for Foo",

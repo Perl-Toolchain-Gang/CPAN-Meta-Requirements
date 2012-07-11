@@ -674,12 +674,12 @@ sub from_string_hash {
     return \@mods;
   }
 
-  sub as_string {
+  sub as_struct {
     my ($self) = @_;
 
     return 0 if ! keys %$self;
 
-    return "$self->{minimum}" if (keys %$self) == 1 and exists $self->{minimum};
+    # return "$self->{minimum}" if (keys %$self) == 1 and exists $self->{minimum};
 
     my @exclusions = @{ $self->{exclusions} || [] };
 
@@ -693,28 +693,27 @@ sub from_string_hash {
       if (exists $self->{$k}) {
         my @new_exclusions = grep { $_ != $self->{ $k } } @exclusions;
         if (@new_exclusions == @exclusions) {
-          push @parts, "$op $self->{ $k }";
+          push @parts, [ $op, "$self->{ $k }" ];
         } else {
-          push @parts, "$e_op $self->{ $k }";
+          push @parts, [ $e_op, "$self->{ $k }" ];
           @exclusions = @new_exclusions;
         }
       }
     }
 
-    push @parts, map {; "!= $_" } @exclusions;
+    push @parts, map {; [ "!=", "$_" ] } @exclusions;
 
-    return join q{, }, @parts;
+    return \@parts;
   }
 
-  sub as_struct {
+  sub as_string {
     my ($self) = @_;
 
-    return [
-      (exists $self->{maximum} ? [ '<=', "$self->{maximum}" ] : ()),
-      (exists $self->{minimum} ? [ '>=', "$self->{minimum}" ] : ()),
-      ($self->{exclusions}
-        ? (map {; [ '!=', "$_" ] } @{$self->{exclusions}}) : ())
-    ]
+    my @parts = @{ $self->as_struct };
+
+    return $parts[0][1] if @parts == 1 and $parts[0][0] eq '>=';
+
+    return join q{, }, map {; join q{ }, @$_ } @parts;
   }
 
   sub with_exact_version {
