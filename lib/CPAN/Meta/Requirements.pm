@@ -341,6 +341,24 @@ sub requirements_for_module {
   return $entry->as_string;
 }
 
+=method structured_requirements_for_module
+
+  $req->structured_requirements_for_module( $module );
+
+This returns a data structure containing the version requirements for a given
+module or undef if the given module has no requirements.  This should only be
+used for informational purposes such as error messages and should not be
+interpreted or used for comparison (see L</accepts_module> instead.)
+
+=cut
+
+sub structured_requirements_for_module {
+  my ($self, $module) = @_;
+  my $entry = $self->__entry_for($module);
+  return unless $entry;
+  return $entry->as_struct;
+}
+
 =method required_modules
 
 This method returns a list of all the modules for which requirements have been
@@ -589,6 +607,8 @@ sub from_string_hash {
 
   sub as_string { return "== $_[0]{version}" }
 
+  sub as_struct { return [ [ '==', "$_[0]{version}" ] ] }
+
   sub as_modifiers { return [ [ exact_version => $_[0]{version} ] ] }
 
   sub _clone {
@@ -685,6 +705,17 @@ sub from_string_hash {
     push @parts, map {; "!= $_" } @exclusions;
 
     return join q{, }, @parts;
+  }
+
+  sub as_struct {
+    my ($self) = @_;
+
+    return [
+      (exists $self->{maximum} ? [ '<=', "$self->{maximum}" ] : ()),
+      (exists $self->{minimum} ? [ '>=', "$self->{minimum}" ] : ()),
+      ($self->{exclusions}
+        ? (map {; [ '!=', "$_" ] } @{$self->{exclusions}}) : ())
+    ]
   }
 
   sub with_exact_version {

@@ -188,6 +188,18 @@ sub dies_ok (&@) {
     },
     'test exclusion-skipping',
   );
+
+  is_deeply(
+    $req->structured_requirements_for_module('Foo'),
+    # remember, it's okay to change the exact results, as long as the meaning
+    # is unchanged -- rjbs, 2012-07-11
+    [
+      [ '<=', '3' ],
+      [ '>=', '1' ],
+      [ '!=', '2' ],
+    ],
+    "structured requirements for Foo",
+  );
 }
 
 sub foo_1 {
@@ -225,6 +237,12 @@ sub foo_1 {
   my $req = foo_1;
 
   is($req->requirements_for_module('Foo'), '== 1', 'requirements_for_module');
+
+  is_deeply(
+    $req->structured_requirements_for_module('Foo'),
+    [ [ '==', '1' ] ],
+    'structured_requirements_for_module'
+  );
 
   # test empty/undef returns
   my @list = $req->requirements_for_module('FooBarBamBaz');
