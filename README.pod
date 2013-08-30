@@ -1,10 +1,14 @@
+=pod
+
+=encoding utf-8
+
 =head1 NAME
 
 CPAN::Meta::Requirements - a set of version requirements for a CPAN dist
 
 =head1 VERSION
 
-version 2.122
+version 2.123
 
 =head1 SYNOPSIS
 
@@ -254,7 +258,7 @@ CPAN::Meta::Requirements object.
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Meta-Requirements>.
+at L<https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Meta-Requirements>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -264,7 +268,7 @@ public review and contribution under the terms of the license.
 
 L<https://github.com/dagolden/cpan-meta-requirements>
 
-  git clone https://github.com/dagolden/cpan-meta-requirements.git
+  git clone git://github.com/dagolden/cpan-meta-requirements.git
 
 =head1 AUTHORS
 
