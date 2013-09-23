@@ -2,9 +2,16 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+    [FIXED]
+
+    - Better fix than 2.123.  On old perls, rather than install into
+      'core', we continue to install into the proper 'site' library,
+      but force UNINST=1 when necessary to remove stale copies
+      from ExtUtils::MakeMaker
+
 2.123     2013-08-30 12:17:14 America/New_York
 
-    [Fixed]
+    [FIXED]
 
     - On Perls prior to v5.12, CPAN::Meta::Requirements will be installed
       into the 'core' library path to avoid an older version bundled with
@@ -12,7 +19,7 @@ Revision history for CPAN-Meta-Requirements
 
 2.122     2012-05-02 17:29:17 America/New_York
 
-    [Fixed]
+    [FIXED]
 
     - Fix typo in documentation: the exclusion symbol is "!=" rather than
       just "!". The implemenation was correct, just the docs were wrong.
