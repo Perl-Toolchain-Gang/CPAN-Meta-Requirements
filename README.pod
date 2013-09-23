@@ -8,7 +8,7 @@ CPAN::Meta::Requirements - a set of version requirements for a CPAN dist
 
 =head1 VERSION
 
-version 2.123
+version 2.124
 
 =head1 SYNOPSIS
 

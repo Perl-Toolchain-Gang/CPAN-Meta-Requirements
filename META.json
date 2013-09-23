@@ -64,7 +64,7 @@
    "provides" : {
       "CPAN::Meta::Requirements" : {
          "file" : "lib/CPAN/Meta/Requirements.pm",
-         "version" : "2.123"
+         "version" : "2.124"
       }
    },
    "release_status" : "stable",
@@ -80,7 +80,7 @@
          "web" : "https://github.com/dagolden/cpan-meta-requirements"
       }
    },
-   "version" : "2.123",
+   "version" : "2.124",
    "x_authority" : "cpan:DAGOLDEN"
 }
 
