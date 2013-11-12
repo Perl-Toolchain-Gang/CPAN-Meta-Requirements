@@ -196,7 +196,7 @@ sub add_requirements {
 
 =method accepts_module
 
-  my $bool = $req->accepts_modules($module => $version);
+  my $bool = $req->accepts_module($module => $version);
 
 Given an module and version, this method returns true if the version
 specification for the module accepts the provided version.  In other words,
