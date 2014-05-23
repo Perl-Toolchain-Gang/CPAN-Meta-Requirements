@@ -21,7 +21,8 @@ package CPAN::Meta::Requirements;
 =head1 DESCRIPTION
 
 A CPAN::Meta::Requirements object models a set of version constraints like
-those specified in the F<META.yml> or F<META.json> files in CPAN distributions.
+those specified in the F<META.yml> or F<META.json> files in CPAN distributions,
+and as defined by L<CPAN::Meta::Spec>;
 It can be built up by adding more and more constraints, and it will reduce them
 to the simplest representation.
 
@@ -349,7 +350,7 @@ sub finalize { $_[0]{finalized} = 1 }
 =method as_string_hash
 
 This returns a reference to a hash describing the requirements using the
-strings in the F<META.yml> specification.
+strings in the L<CPAN::Meta::Spec> specification.
 
 For example after the following program:
 
