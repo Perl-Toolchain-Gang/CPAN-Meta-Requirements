@@ -2,6 +2,10 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+    [FIXED]
+
+    - Fixed compatibility with version.pm 0.77
+
     [DOCUMENTED]
 
     - Minor documentation fixes

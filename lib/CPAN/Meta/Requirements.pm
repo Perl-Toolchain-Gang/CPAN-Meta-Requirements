@@ -69,6 +69,7 @@ sub _version_object {
   my $vobj;
 
   eval {
+    local $SIG{__WARN__} = sub { die "Invalid version: $_[0]" };
     $vobj  = (! defined $version)                ? version->parse(0)
            : (! Scalar::Util::blessed($version)) ? version->parse($version)
            :                                       $version;
