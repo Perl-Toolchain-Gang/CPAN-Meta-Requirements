@@ -40,12 +40,12 @@ use version 0.77 (); # the ->parse method
   my $req = CPAN::Meta::Requirements->new;
 
 This returns a new CPAN::Meta::Requirements object.  It takes an optional
-hash reference argument.  The following keys are supported:
+hash reference argument.  Currently, only one key is supported:
 
 =for :list
-* <bad_version_hook> -- if provided, when a version cannot be parsed into
-a version object, this code reference will be called with the invalid version
-string as an argument.  It must return a valid version object.
+* C<bad_version_hook> -- if provided, when a version cannot be parsed into
+  a version object, this code reference will be called with the invalid version
+  string as an argument.  It must return a valid version object.
 
 All other keys are ignored.
 
