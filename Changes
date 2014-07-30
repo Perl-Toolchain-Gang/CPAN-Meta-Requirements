@@ -2,6 +2,8 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+2.126     2014-07-30 16:26:29-04:00 America/New_York
+
     [FIXED]
 
     - Fixed compatibility with version.pm 0.77
