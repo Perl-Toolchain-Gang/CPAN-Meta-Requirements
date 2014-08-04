@@ -63,10 +63,36 @@ sub new {
   return bless \%self => $class;
 }
 
+# from version::vpp
+sub _find_magic_vstring {
+  my $value = shift;
+  my $tvalue = '';
+  require B;
+  my $sv = B::svref_2object(\$value);
+  my $magic = ref($sv) eq 'B::PVMG' ? $sv->MAGIC : undef;
+  while ( $magic ) {
+    if ( $magic->TYPE eq 'V' ) {
+      $tvalue = $magic->PTR;
+      $tvalue =~ s/^v?(.+)$/v$1/;
+      last;
+    }
+    else {
+      $magic = $magic->MOREMAGIC;
+    }
+  }
+  return $tvalue;
+}
+
 sub _version_object {
   my ($self, $version) = @_;
 
   my $vobj;
+
+  # hack around version::vpp not handling <3 character vstring literals
+  if ( $INC{'version/vpp.pm'} ) {
+    my $magic = _find_magic_vstring( $version );
+    $version = $magic if length $magic;
+  }
 
   eval {
     local $SIG{__WARN__} = sub { die "Invalid version: $_[0]" };
