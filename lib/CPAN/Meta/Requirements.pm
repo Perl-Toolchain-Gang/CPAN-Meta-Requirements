@@ -33,7 +33,7 @@ exceptions.
 
 use Carp ();
 use Scalar::Util ();
-use version 0.77 (); # the ->parse method
+use version ();
 
 =method new
 
@@ -96,8 +96,8 @@ sub _version_object {
 
   eval {
     local $SIG{__WARN__} = sub { die "Invalid version: $_[0]" };
-    $vobj  = (! defined $version)                ? version->parse(0)
-           : (! Scalar::Util::blessed($version)) ? version->parse($version)
+    $vobj  = (! defined $version)                ? version->new(0)
+           : (! Scalar::Util::blessed($version)) ? version->new($version)
            :                                       $version;
   };
 
@@ -113,12 +113,12 @@ sub _version_object {
 
   # ensure no leading '.'
   if ( $vobj =~ m{\A\.} ) {
-    $vobj = version->parse("0$vobj");
+    $vobj = version->new("0$vobj");
   }
 
   # ensure normal v-string form
   if ( $vobj->is_qv ) {
-    $vobj = version->parse($vobj->normal);
+    $vobj = version->new($vobj->normal);
   }
 
   return $vobj;
