@@ -33,7 +33,17 @@ exceptions.
 
 use Carp ();
 use Scalar::Util ();
-use version ();
+
+# To help ExtUtils::MakeMaker bootstrap CPAN::Meta::Requirements on perls
+# before 5.10, we fall back to the EUMM bundled compatibility version module if
+# that's the only thing available.  This shouldn't ever happen in a normal CPAN
+# install of CPAN::Meta::Requirements, as version.pm will be picked up from
+# prereqs and be available at runtime.
+
+BEGIN { eval "use version ()" or eval "use ExtUtils::MakeMaker::version" } ## no critic
+
+# Perl 5.10.0 didn't have "is_qv" in version.pm
+*_is_qv = version->can('is_qv') ? sub { $_[0]->is_qv } : sub { exists $_[0]->{qv} };
 
 =method new
 
@@ -89,7 +99,7 @@ sub _version_object {
   my $vobj;
 
   # hack around version::vpp not handling <3 character vstring literals
-  if ( $INC{'version/vpp.pm'} ) {
+  if ( $INC{'version/vpp.pm'} || $INC{'ExtUtils/MakeMaker/version/vpp.pm'} ) {
     my $magic = _find_magic_vstring( $version );
     $version = $magic if length $magic;
   }
@@ -117,7 +127,7 @@ sub _version_object {
   }
 
   # ensure normal v-string form
-  if ( $vobj->is_qv ) {
+  if ( _is_qv($vobj) ) {
     $vobj = version->new($vobj->normal);
   }
 
