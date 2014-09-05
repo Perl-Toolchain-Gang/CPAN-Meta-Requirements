@@ -2,6 +2,8 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+2.127     2014-09-04 22:17:44-04:00 America/New_York
+
     [FIXED]
 
     - Works around limitations in version::vpp detecting v-string magic
