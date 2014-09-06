@@ -2,6 +2,11 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+    [FIXED]
+
+    - Throws an error at compile time if neither version nor
+      the ExtUtils::MakeMaker bootstrap are available
+
 2.127     2014-09-04 22:17:44-04:00 America/New_York
 
     [FIXED]
