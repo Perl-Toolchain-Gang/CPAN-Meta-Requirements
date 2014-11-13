@@ -435,10 +435,12 @@ sub as_string_hash {
 =method add_string_requirement
 
   $req->add_string_requirement('Library::Foo' => '>= 1.208, <= 2.206');
+  $req->add_string_requirement('Library::Foo' => v1.208);
 
 This method parses the passed in string and adds the appropriate requirement
-for the given module.  It understands version ranges as described in the
-L<CPAN::Meta::Spec/Version Ranges>. For example:
+for the given module.  A version can be a Perl "v-string".  It understands
+version ranges as described in the L<CPAN::Meta::Spec/Version Ranges>. For
+example:
 
 =over 4
 
@@ -480,8 +482,13 @@ sub add_string_requirement {
   Carp::confess("No requirement string provided for $module")
     unless defined $req && length $req;
 
-  my @parts = split qr{\s*,\s*}, $req;
+  my $magic = _find_magic_vstring( $req );
+  if (length $magic) {
+    $self->add_minimum($module => $magic);
+    return;
+  }
 
+  my @parts = split qr{\s*,\s*}, $req;
 
   for my $part (@parts) {
     my ($op, $ver) = $part =~ m{\A\s*(==|>=|>|<=|<|!=)\s*(.*)\z};
@@ -503,7 +510,8 @@ sub add_string_requirement {
 
 This is an alternate constructor for a CPAN::Meta::Requirements object.  It takes
 a hash of module names and version requirement strings and returns a new
-CPAN::Meta::Requirements object.
+CPAN::Meta::Requirements object. As with add_string_requirement, a
+version can be a Perl "v-string".
 
 =cut
 
