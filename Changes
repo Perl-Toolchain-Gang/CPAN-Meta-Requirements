@@ -2,6 +2,10 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+    [FIXED]
+
+    - from_string_hash can now accept v-strings as hash values
+
 2.128     2014-09-06 00:04:22-04:00 America/New_York
 
     [FIXED]
