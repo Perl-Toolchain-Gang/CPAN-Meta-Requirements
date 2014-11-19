@@ -508,18 +508,21 @@ sub add_string_requirement {
 =method from_string_hash
 
   my $req = CPAN::Meta::Requirements->from_string_hash( \%hash );
+  my $req = CPAN::Meta::Requirements->from_string_hash( \%hash, \%opts );
 
-This is an alternate constructor for a CPAN::Meta::Requirements object.  It takes
-a hash of module names and version requirement strings and returns a new
-CPAN::Meta::Requirements object. As with add_string_requirement, a
-version can be a Perl "v-string".
+This is an alternate constructor for a CPAN::Meta::Requirements
+object. It takes a hash of module names and version requirement
+strings and returns a new CPAN::Meta::Requirements object. As with
+add_string_requirement, a version can be a Perl "v-string". Optionally,
+you can supply a hash-reference of options, exactly as with the L</new>
+method.
 
 =cut
 
 sub from_string_hash {
-  my ($class, $hash) = @_;
+  my ($class, $hash, $options) = @_;
 
-  my $self = $class->new;
+  my $self = $class->new($options);
 
   for my $module (keys %$hash) {
     my $req = $hash->{$module};

@@ -84,4 +84,17 @@ sub dies_ok (&@) {
   );
 }
 
+
+{
+  my $req = CPAN::Meta::Requirements->from_string_hash(
+    { Bad => 'invalid', },
+    { bad_version_hook => sub { version->new(42) } },
+  );
+
+  ok(
+    $req->accepts_module(Bad => 42),
+    "options work 2nd arg to f_s_h",
+  );
+}
+
 done_testing;
