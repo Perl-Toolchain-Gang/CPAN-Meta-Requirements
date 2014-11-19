@@ -60,8 +60,9 @@ hash reference argument.  Currently, only one key is supported:
 
 =for :list
 * C<bad_version_hook> -- if provided, when a version cannot be parsed into
-  a version object, this code reference will be called with the invalid version
-  string as an argument.  It must return a valid version object.
+  a version object, this code reference will be called with the invalid
+  version string as first argument, and the module name as second
+  argument.  It must return a valid version object.
 
 All other keys are ignored.
 
@@ -100,7 +101,7 @@ sub _find_magic_vstring {
 }
 
 sub _version_object {
-  my ($self, $version) = @_;
+  my ($self, $module, $version) = @_;
 
   my $vobj;
 
@@ -119,7 +120,7 @@ sub _version_object {
 
   if ( my $err = $@ ) {
     my $hook = $self->{bad_version_hook};
-    $vobj = eval { $hook->($version) }
+    $vobj = eval { $hook->($version, $module) }
       if ref $hook eq 'CODE';
     unless (Scalar::Util::blessed($vobj) && $vobj->isa("version")) {
       $err =~ s{ at .* line \d+.*$}{};
@@ -200,7 +201,7 @@ BEGIN {
     my $code = sub {
       my ($self, $name, $version) = @_;
 
-      $version = $self->_version_object( $version );
+      $version = $self->_version_object( $name, $version );
 
       $self->__modify_entry_for($name, $method, $version);
 
@@ -258,7 +259,7 @@ true.
 sub accepts_module {
   my ($self, $module, $version) = @_;
 
-  $version = $self->_version_object( $version );
+  $version = $self->_version_object( $module, $version );
 
   return 1 unless my $range = $self->__entry_for($module);
   return $range->_accepts($version);

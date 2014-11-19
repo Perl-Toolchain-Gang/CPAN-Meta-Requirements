@@ -25,13 +25,15 @@ sub dies_ok (&@) {
   }
 }
 
-sub _fixit { return version->new(42) }
+my $hook_text;
+sub _fixit { my ($v, $m) = @_; $hook_text = $m; return version->new(42) }
 
 {
   my $req = CPAN::Meta::Requirements->new( {bad_version_hook => \&_fixit} );
 
   my ($k, $v);
   $req->add_minimum($k => $v) while ($k, $v) = each %input;
+  is $hook_text, 'Foo::Baz', 'hook stored module name';
 
   is_deeply(
     $req->as_string_hash,
