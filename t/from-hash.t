@@ -46,24 +46,22 @@ sub dies_ok (&@) {
 }
 
 {
-  my $string_hash = {
-    Left   => 10,
-    Shared => undef,
-    Right  => 18,
-  };
+  my $undef_hash = { Undef => undef };
+  my $z_hash = { ZeroLength => '' };
 
   my $warning;
   local $SIG{__WARN__} = sub { $warning = join("\n",@_) };
 
-  my $req = CPAN::Meta::Requirements->from_string_hash($string_hash);
-
-  is(
-    $req->as_string_hash->{Shared}, 0,
-    "undef requirement treated as '0'",
-  );
-
+  my $req = CPAN::Meta::Requirements->from_string_hash($undef_hash);
   like ($warning, qr/Undefined requirement.*treated as '0'/, "undef requirement warns");
+  $req->add_string_requirement(%$z_hash);
+  like ($warning, qr/Undefined requirement.*treated as '0'/, "'' requirement warns");
 
+  is_deeply(
+    $req->as_string_hash,
+    { map { ($_ => 0) } keys(%$undef_hash), keys(%$z_hash) },
+    "undef/'' requirements treated as '0'",
+  );
 }
 
 {

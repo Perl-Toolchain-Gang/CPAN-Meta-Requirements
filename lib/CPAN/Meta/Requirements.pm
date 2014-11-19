@@ -480,8 +480,10 @@ my %methods_for_op = (
 sub add_string_requirement {
   my ($self, $module, $req) = @_;
 
-  Carp::confess("No requirement string provided for $module")
-    unless defined $req && length $req;
+  unless ( defined $req && length $req ) {
+    $req = 0;
+    $self->_blank_carp($module);
+  }
 
   my $magic = _find_magic_vstring( $req );
   if (length $magic) {
@@ -516,6 +518,11 @@ version can be a Perl "v-string".
 
 =cut
 
+sub _blank_carp {
+  my ($self, $module) = @_;
+  Carp::carp("Undefined requirement for $module treated as '0'");
+}
+
 sub from_string_hash {
   my ($class, $hash) = @_;
 
@@ -525,7 +532,7 @@ sub from_string_hash {
     my $req = $hash->{$module};
     unless ( defined $req && length $req ) {
       $req = 0;
-      Carp::carp("Undefined requirement for $module treated as '0'");
+      $class->_blank_carp($module);
     }
     $self->add_string_requirement($module, $req);
   }
