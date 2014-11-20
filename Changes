@@ -2,6 +2,8 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+2.130     2014-11-19 23:25:46-05:00 America/New_York
+
     [ADDED]
 
     - from_string_hash can take optional constructor arguments
