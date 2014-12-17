@@ -33,7 +33,6 @@ exceptions.
 =cut
 
 use Carp ();
-use Scalar::Util ();
 
 # To help ExtUtils::MakeMaker bootstrap CPAN::Meta::Requirements on perls
 # before 5.10, we fall back to the EUMM bundled compatibility version module if
@@ -113,16 +112,16 @@ sub _version_object {
 
   eval {
     local $SIG{__WARN__} = sub { die "Invalid version: $_[0]" };
-    $vobj  = (! defined $version)                ? version->new(0)
-           : (! Scalar::Util::blessed($version)) ? version->new($version)
-           :                                       $version;
+    $vobj  = (!defined $version)                 ? version->new(0)
+           : (eval { $version->isa("version") }) ? $version
+           :                                       version->new($version);
   };
 
   if ( my $err = $@ ) {
     my $hook = $self->{bad_version_hook};
     $vobj = eval { $hook->($version, $module) }
       if ref $hook eq 'CODE';
-    unless (Scalar::Util::blessed($vobj) && $vobj->isa("version")) {
+    unless (eval { $vobj->isa("version") }) {
       $err =~ s{ at .* line \d+.*$}{};
       die "Can't convert '$version': $err";
     }
