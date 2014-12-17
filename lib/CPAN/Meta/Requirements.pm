@@ -194,7 +194,7 @@ This method returns the requirements object.
 =cut
 
 BEGIN {
-  for my $type (qw(minimum maximum exclusion exact_version)) {
+  for my $type (qw(maximum exclusion exact_version)) {
     my $method = "with_$type";
     my $to_add = $type eq 'exact_version' ? $type : "add_$type";
 
@@ -211,6 +211,25 @@ BEGIN {
     no strict 'refs';
     *$to_add = $code;
   }
+}
+
+sub add_minimum {
+  my ($self, $name, $version) = @_;
+
+  if (not defined $version or $version eq '0') {
+    return $self if $self->__entry_for($name);
+    Carp::confess("can't add new requirements to finalized requirements")
+      if $self->is_finalized;
+
+    $self->{requirements}{ $name } =
+      CPAN::Meta::Requirements::_Range::Range->with_minimum(0);
+  }
+  else {
+    $version = $self->_version_object( $name, $version );
+
+    $self->__modify_entry_for($name, 'with_minimum', $version);
+  }
+  return $self;
 }
 
 =method add_requirements
