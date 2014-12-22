@@ -50,6 +50,9 @@ BEGIN {
 # Perl 5.10.0 didn't have "is_qv" in version.pm
 *_is_qv = version->can('is_qv') ? sub { $_[0]->is_qv } : sub { exists $_[0]->{qv} };
 
+# construct once, reuse many times
+my $V0 = version->new(0);
+
 =method new
 
   my $req = CPAN::Meta::Requirements->new;
@@ -99,6 +102,11 @@ sub _find_magic_vstring {
   return $tvalue;
 }
 
+# safe if given an unblessed reference
+sub _isa_version {
+  UNIVERSAL::isa( $_[0], 'UNIVERSAL' ) && $_[0]->isa('version')
+}
+
 sub _version_object {
   my ($self, $module, $version) = @_;
 
@@ -111,10 +119,16 @@ sub _version_object {
   }
 
   eval {
-    local $SIG{__WARN__} = sub { die "Invalid version: $_[0]" };
-    $vobj  = (!defined $version)                 ? version->new(0)
-           : (eval { $version->isa("version") }) ? $version
-           :                                       version->new($version);
+    if (not defined $version or $version eq '0') {
+      $vobj = $V0;
+    }
+    elsif ( ref($version) eq 'version' || _isa_version($version) ) {
+      $vobj = $version;
+    }
+    else {
+      local $SIG{__WARN__} = sub { die "Invalid version: $_[0]" };
+      $vobj = version->new($version);
+    }
   };
 
   if ( my $err = $@ ) {
@@ -211,8 +225,6 @@ BEGIN {
     *$to_add = $code;
   }
 }
-
-my $V0 = version->new(0);
 
 sub add_minimum {
   my ($self, $name, $version) = @_;
