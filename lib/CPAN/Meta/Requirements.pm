@@ -213,6 +213,8 @@ BEGIN {
   }
 }
 
+my $V0 = version->new(0);
+
 sub add_minimum {
   my ($self, $name, $version) = @_;
 
@@ -222,7 +224,7 @@ sub add_minimum {
       if $self->is_finalized;
 
     $self->{requirements}{ $name } =
-      CPAN::Meta::Requirements::_Range::Range->with_minimum(0);
+      CPAN::Meta::Requirements::_Range::Range->with_minimum($V0);
   }
   else {
     $version = $self->_version_object( $name, $version );
