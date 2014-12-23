@@ -2,6 +2,8 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+2.131     2014-12-23 15:04:19-05:00 America/New_York
+
     [ENHANCEMENTS]
 
     - Merging Module => 0 into requirements is now optimized
