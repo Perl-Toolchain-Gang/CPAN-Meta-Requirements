@@ -6,6 +6,10 @@ Revision history for CPAN-Meta-Requirements
 
     - Merging Module => 0 into requirements is now optimized
 
+    [PREREQS]
+
+    - Scalar::Utils removed as a prerequisite
+
 2.130     2014-11-19 23:25:46-05:00 America/New_York
 
     [ADDED]
