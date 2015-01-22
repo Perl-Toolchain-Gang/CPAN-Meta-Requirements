@@ -238,13 +238,17 @@ sub foo_1 {
 
   $req->add_minimum(Foo => "0.00");
 
+  my $req2 = CPAN::Meta::Requirements->new;
+  $req2->add_requirements($req);
+
   is_deeply(
-    $req->as_string_hash,
+    $req2->as_string_hash,
     {
       Foo => '0.00'
     },
     "0.00 precision preserved",
   );
+
 }
 
 done_testing;

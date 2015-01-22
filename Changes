@@ -2,6 +2,11 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+    [FIXED]
+
+    - Precision of version requirement "0.00" is preserved when merging
+      requirements.
+
 2.131     2014-12-23 15:04:19-05:00 America/New_York
 
     [ENHANCEMENTS]
