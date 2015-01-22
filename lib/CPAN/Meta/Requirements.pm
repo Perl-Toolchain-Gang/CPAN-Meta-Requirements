@@ -3,7 +3,7 @@ use warnings;
 package CPAN::Meta::Requirements;
 # ABSTRACT: a set of version requirements for a CPAN dist
 
-our $VERSION = '2.132';
+our $VERSION = '2.133';
 
 =head1 SYNOPSIS
 
