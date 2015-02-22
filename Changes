@@ -2,6 +2,8 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+2.133     2015-02-22 06:35:34-05:00 America/New_York
+
     [FIXED]
 
     - In fixing preservation of "0.00", some Module => 0 optimizations were
