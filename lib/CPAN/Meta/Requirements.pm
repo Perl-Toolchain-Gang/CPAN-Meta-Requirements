@@ -349,6 +349,8 @@ This returns a data structure containing the version requirements for a given
 module or undef if the given module has no requirements.  This should
 not be used for version checks (see L</accepts_module> instead).
 
+Added in version 2.134.
+
 =cut
 
 sub structured_requirements_for_module {
