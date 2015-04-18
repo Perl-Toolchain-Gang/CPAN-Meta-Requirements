@@ -218,7 +218,7 @@ BEGIN {
 
       return $self;
     };
-    
+
     no strict 'refs';
     *$to_add = $code;
   }
@@ -346,7 +346,7 @@ sub requirements_for_module {
   $req->structured_requirements_for_module( $module );
 
 This returns a data structure containing the version requirements for a given
-module or undef if the given module has no requirements.  This should 
+module or undef if the given module has no requirements.  This should
 not be used for version checks (see L</accepts_module> instead).
 
 =cut
@@ -678,8 +678,6 @@ sub from_string_hash {
     my ($self) = @_;
 
     return 0 if ! keys %$self;
-
-    # return "$self->{minimum}" if (keys %$self) == 1 and exists $self->{minimum};
 
     my @exclusions = @{ $self->{exclusions} || [] };
 
