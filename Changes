@@ -2,6 +2,8 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+2.134     2015-04-18 13:20:56+02:00 Europe/Berlin (TRIAL RELEASE)
+
     [ADDED]
 
     - Added method for getting structured requirements
