@@ -1,3 +1,4 @@
+use 5.006; # keep at v5.6 for CPAN.pm
 use strict;
 use warnings;
 package CPAN::Meta::Requirements;
