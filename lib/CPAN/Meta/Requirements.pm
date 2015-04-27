@@ -244,7 +244,7 @@ sub add_minimum {
       if $self->is_finalized;
 
     $self->{requirements}{ $name } =
-      CPAN::Meta::Requirements::_Range::Range->with_minimum($V0);
+      CPAN::Meta::Requirements::_Range::Range->with_minimum($V0, $name);
   }
   else {
     $version = $self->_version_object( $name, $version );
@@ -258,9 +258,9 @@ sub add_minimum {
 
   $req->add_requirements( $another_req_object );
 
-This method adds all the requirements in the given CPAN::Meta::Requirements object
-to the requirements object on which it was called.  If there are any conflicts,
-an exception is thrown.
+This method adds all the requirements in the given CPAN::Meta::Requirements
+object to the requirements object on which it was called.  If there are any
+conflicts, an exception is thrown.
 
 This method returns the requirements object.
 
@@ -404,7 +404,7 @@ sub __modify_entry_for {
     if $fin and not $old;
 
   my $new = ($old || 'CPAN::Meta::Requirements::_Range::Range')
-          ->$method($version);
+          ->$method($version, $name);
 
   Carp::confess("can't modify finalized requirements")
     if $fin and $old->as_string ne $new->as_string;
@@ -619,34 +619,58 @@ sub from_string_hash {
 
   sub as_modifiers { return [ [ exact_version => $_[0]{version} ] ] }
 
+  sub _reject_requirements {
+    my ($self, $module, $error) = @_;
+    Carp::confess("illegal requirements for $module: $error")
+  }
+
   sub _clone {
     (ref $_[0])->_new( version->new( $_[0]{version} ) )
   }
 
   sub with_exact_version {
-    my ($self, $version) = @_;
+    my ($self, $version, $module) = @_;
+    $module = 'module' unless defined $module;
 
     return $self->_clone if $self->_accepts($version);
 
-    Carp::confess("illegal requirements: unequal exact version specified");
+    $self->_reject_requirements(
+      $module,
+      "can't be exactly $version when exact requirement is already $self->{version}",
+    );
   }
 
   sub with_minimum {
-    my ($self, $minimum) = @_;
+    my ($self, $minimum, $module) = @_;
+    $module = 'module' unless defined $module;
+
     return $self->_clone if $self->{version} >= $minimum;
-    Carp::confess("illegal requirements: minimum above exact specification");
+    $self->_reject_requirements(
+      $module,
+      "minimum $minimum exceeds exact specification $self->{version}",
+    );
   }
 
   sub with_maximum {
-    my ($self, $maximum) = @_;
+    my ($self, $maximum, $module) = @_;
+    $module = 'module' unless defined $module;
+
     return $self->_clone if $self->{version} <= $maximum;
-    Carp::confess("illegal requirements: maximum below exact specification");
+    $self->_reject_requirements(
+      $module,
+      "maximum $maximum below exact specification $self->{version}",
+    );
   }
 
   sub with_exclusion {
-    my ($self, $exclusion) = @_;
+    my ($self, $exclusion, $module) = @_;
+    $module = 'module' unless defined $module;
+
     return $self->_clone unless $exclusion == $self->{version};
-    Carp::confess("illegal requirements: excluded exact specification");
+    $self->_reject_requirements(
+      $module,
+      "tried to exclude $exclusion, which is already exactly specified",
+    );
   }
 }
 
@@ -723,29 +747,47 @@ sub from_string_hash {
     return join q{, }, map {; join q{ }, @$_ } @parts;
   }
 
+  sub _reject_requirements {
+    my ($self, $module, $error) = @_;
+    Carp::confess("illegal requirements for $module: $error")
+  }
+
   sub with_exact_version {
-    my ($self, $version) = @_;
+    my ($self, $version, $module) = @_;
+    $module = 'module' unless defined $module;
     $self = $self->_clone;
 
-    Carp::confess("illegal requirements: exact specification outside of range")
-      unless $self->_accepts($version);
+    unless ($self->_accepts($version)) {
+      $self->_reject_requirements(
+        $module,
+        "exact specification $version outside of range " . $self->as_string
+      );
+    }
 
     return CPAN::Meta::Requirements::_Range::Exact->_new($version);
   }
 
   sub _simplify {
-    my ($self) = @_;
+    my ($self, $module) = @_;
 
     if (defined $self->{minimum} and defined $self->{maximum}) {
       if ($self->{minimum} == $self->{maximum}) {
-        Carp::confess("illegal requirements: excluded all values")
-          if grep { $_ == $self->{minimum} } @{ $self->{exclusions} || [] };
+        if (grep { $_ == $self->{minimum} } @{ $self->{exclusions} || [] }) {
+          $self->_reject_requirements(
+            $module,
+            "minimum and maximum are both $self->{minimum}, which is excluded",
+          );
+        }
 
         return CPAN::Meta::Requirements::_Range::Exact->_new($self->{minimum})
       }
 
-      Carp::confess("illegal requirements: minimum exceeds maximum")
-        if $self->{minimum} > $self->{maximum};
+      if ($self->{minimum} > $self->{maximum}) {
+        $self->_reject_requirements(
+          $module,
+          "minimum $self->{minimum} exceeds maximum $self->{maximum}",
+        );
+      }
     }
 
     # eliminate irrelevant exclusions
@@ -764,7 +806,8 @@ sub from_string_hash {
   }
 
   sub with_minimum {
-    my ($self, $minimum) = @_;
+    my ($self, $minimum, $module) = @_;
+    $module = 'module' unless defined $module;
     $self = $self->_clone;
 
     if (defined (my $old_min = $self->{minimum})) {
@@ -773,11 +816,12 @@ sub from_string_hash {
       $self->{minimum} = $minimum;
     }
 
-    return $self->_simplify;
+    return $self->_simplify($module);
   }
 
   sub with_maximum {
-    my ($self, $maximum) = @_;
+    my ($self, $maximum, $module) = @_;
+    $module = 'module' unless defined $module;
     $self = $self->_clone;
 
     if (defined (my $old_max = $self->{maximum})) {
@@ -786,16 +830,17 @@ sub from_string_hash {
       $self->{maximum} = $maximum;
     }
 
-    return $self->_simplify;
+    return $self->_simplify($module);
   }
 
   sub with_exclusion {
-    my ($self, $exclusion) = @_;
+    my ($self, $exclusion, $module) = @_;
+    $module = 'module' unless defined $module;
     $self = $self->_clone;
 
     push @{ $self->{exclusions} ||= [] }, $exclusion;
 
-    return $self->_simplify;
+    return $self->_simplify($module);
   }
 
   sub _accepts {
