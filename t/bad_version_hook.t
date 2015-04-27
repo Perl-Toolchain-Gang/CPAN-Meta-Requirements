@@ -17,6 +17,8 @@ my %expected = map { ($_ => $DATA{$_}->[1]) } keys %DATA;
 sub dies_ok (&@) {
   my ($code, $qr, $comment) = @_;
 
+  no warnings 'redefine';
+  local *Regexp::CARP_TRACE  = sub { "<regexp>" };
   my $lived = eval { $code->(); 1 };
 
   if ($lived) {
