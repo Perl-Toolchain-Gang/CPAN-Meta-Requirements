@@ -2,6 +2,8 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+2.135     2015-05-19 13:15:35-04:00 America/New_York (TRIAL RELEASE)
+
     [TESTING]
 
     - Skips impossible tests on Perls earlier than 5.8.0 (before
