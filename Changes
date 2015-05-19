@@ -2,6 +2,11 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+    [TESTING]
+
+    - Skips impossible tests on Perls earlier than 5.8.0 (before
+      v-string magic).
+
 2.134     2015-04-18 13:20:56+02:00 Europe/Berlin (TRIAL RELEASE)
 
     [ADDED]
