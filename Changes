@@ -2,6 +2,11 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+    [FIXED]
+
+    - On Perls before 5.8.1, pad 1-part and 2-part literal v-strings
+      to avoid old version.pm bugs with v-strings less than 3 characters
+
 2.135     2015-05-19 13:15:35-04:00 America/New_York (TRIAL RELEASE)
 
     [TESTING]
