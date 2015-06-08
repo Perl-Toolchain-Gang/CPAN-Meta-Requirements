@@ -116,7 +116,7 @@ sub _version_object {
   if (not defined $version or (!ref($version) && $version eq '0')) {
     return $V0;
   }
-  elsif ( ref($version) eq 'version' || _isa_version($version) ) {
+  elsif ( ref($version) eq 'version' || ( ref($version) && _isa_version($version) ) ) {
     $vobj = $version;
   }
   else {

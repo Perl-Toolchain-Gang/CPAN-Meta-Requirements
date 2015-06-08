@@ -9,6 +9,7 @@ use Test::More 0.88;
 my %DATA = (
   'Foo::Bar' => [ 10, 10 ],
   'Foo::Baz' => [ 'invalid_version', 42 ],
+  'Foo::Baz' => [ 'version', 42 ],
 );
 my %input = map { ($_ => $DATA{$_}->[0]) } keys %DATA;
 my %expected = map { ($_ => $DATA{$_}->[1]) } keys %DATA;
