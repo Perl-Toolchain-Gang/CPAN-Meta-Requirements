@@ -105,7 +105,7 @@ sub _find_magic_vstring {
 
 # safe if given an unblessed reference
 sub _isa_version {
-  UNIVERSAL::isa( $_[0], 'UNIVERSAL' ) && $_[0]->isa('version')
+  UNIVERSAL::isa( $_[0], 'UNIVERSAL' ) && ref $_[0] && $_[0]->isa('version')
 }
 
 sub _version_object {
