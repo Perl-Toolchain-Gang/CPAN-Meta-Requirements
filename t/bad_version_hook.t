@@ -9,7 +9,7 @@ use Test::More 0.88;
 my %DATA = (
   'Foo::Bar' => [ 10, 10 ],
   'Foo::Baz' => [ 'invalid_version', 42 ],
-  'Foo::Baz' => [ 'version', 42 ],
+  'Foo::Qux' => [ 'version', 42 ],
 );
 my %input = map { ($_ => $DATA{$_}->[0]) } keys %DATA;
 my %expected = map { ($_ => $DATA{$_}->[1]) } keys %DATA;
@@ -33,7 +33,10 @@ sub _fixit { my ($v, $m) = @_; $hook_text = $m; return version->new(42) }
   my $req = CPAN::Meta::Requirements->new( {bad_version_hook => \&_fixit} );
 
   my ($k, $v);
-  $req->add_minimum($k => $v) while ($k, $v) = each %input;
+  while (($k, $v) = each %input) {
+    note "adding minimum requirement: $k => $v";
+    $req->add_minimum($k => $v);
+  }
   is $hook_text, 'Foo::Baz', 'hook stored module name';
 
   is_deeply(
