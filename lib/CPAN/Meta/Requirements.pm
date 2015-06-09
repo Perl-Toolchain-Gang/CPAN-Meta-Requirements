@@ -131,6 +131,7 @@ sub _version_object {
     }
     eval {
       local $SIG{__WARN__} = sub { die "Invalid version: $_[0]" };
+      die "Invalid version: $version" unless version::is_lax($version);
       $vobj = version->new($version);
     };
     if ( my $err = $@ ) {

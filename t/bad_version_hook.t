@@ -35,7 +35,8 @@ sub _fixit { my ($v, $m) = @_; $hook_text .= $m; return version->new(42) }
   my ($k, $v);
   while (($k, $v) = each %input) {
     note "adding minimum requirement: $k => $v";
-    $req->add_minimum($k => $v);
+    eval { $req->add_minimum($k => $v) };
+    is( $@, '', "adding minimum '$k' for $v" );
   }
   like( $hook_text, qr/Foo::Baz/, 'hook stored module name' );
 
