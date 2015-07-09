@@ -2,6 +2,8 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+    - much better error messages, explaining what conflicted and how
+
 2.136     2015-06-08 21:35:27-06:00 America/Denver (TRIAL RELEASE)
 
     [FIXED]
