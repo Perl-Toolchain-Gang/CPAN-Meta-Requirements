@@ -2,6 +2,8 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+    - repackage with fixed tests
+
 2.137     2015-07-09 09:53:32-04:00 America/New_York (TRIAL RELEASE)
 
     - much better error messages, explaining what conflicted and how
