@@ -12,7 +12,6 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "6.17"
   },
   "DISTNAME" => "CPAN-Meta-Requirements",
-  "EXE_FILES" => [],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "CPAN::Meta::Requirements",
@@ -39,7 +38,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "B" => 0,
   "Carp" => 0,
-  "ExtUtils::MakeMaker" => "6.17",
+  "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Test::More" => "0.88",
   "strict" => 0,
