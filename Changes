@@ -2,6 +2,8 @@ Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
 
+    - expanded dist.ini from author bundle to individual plugins
+
 2.138     2015-07-13 22:32:37-04:00 America/New_York (TRIAL RELEASE)
 
     - repackage with fixed tests
