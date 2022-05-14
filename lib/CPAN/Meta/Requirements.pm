@@ -240,7 +240,7 @@ sub add_minimum {
   # which preserves the user's choice of "0.00" as the requirement
   if (not defined $version or "$version" eq '0') {
     return $self if $self->__entry_for($name);
-    Carp::confess("can't add new requirements to finalized requirements")
+    Carp::croak("can't add new requirements to finalized requirements")
       if $self->is_finalized;
 
     $self->{requirements}{ $name } =
@@ -321,7 +321,7 @@ sub clear_requirement {
 
   return $self unless $self->__entry_for($module);
 
-  Carp::confess("can't clear requirements on finalized requirements")
+  Carp::croak("can't clear requirements on finalized requirements")
     if $self->is_finalized;
 
   delete $self->{requirements}{ $module };
@@ -400,13 +400,13 @@ sub __modify_entry_for {
   my $fin = $self->is_finalized;
   my $old = $self->__entry_for($name);
 
-  Carp::confess("can't add new requirements to finalized requirements")
+  Carp::croak("can't add new requirements to finalized requirements")
     if $fin and not $old;
 
   my $new = ($old || 'CPAN::Meta::Requirements::_Range::Range')
           ->$method($version, $name);
 
-  Carp::confess("can't modify finalized requirements")
+  Carp::croak("can't modify finalized requirements")
     if $fin and $old->as_string ne $new->as_string;
 
   $self->{requirements}{ $name } = $new;
@@ -560,7 +560,7 @@ sub add_string_requirement {
     if (! defined $op) {
       $self->add_minimum($module => $part);
     } else {
-      Carp::confess("illegal requirement string: $req")
+      Carp::croak("illegal requirement string: $req")
         unless my $methods = $methods_for_op{ $op };
 
       $self->$_($module => $ver) for @$methods;
@@ -621,7 +621,7 @@ sub from_string_hash {
 
   sub _reject_requirements {
     my ($self, $module, $error) = @_;
-    Carp::confess("illegal requirements for $module: $error")
+    Carp::croak("illegal requirements for $module: $error")
   }
 
   sub _clone {
@@ -749,7 +749,7 @@ sub from_string_hash {
 
   sub _reject_requirements {
     my ($self, $module, $error) = @_;
-    Carp::confess("illegal requirements for $module: $error")
+    Carp::croak("illegal requirements for $module: $error")
   }
 
   sub with_exact_version {
