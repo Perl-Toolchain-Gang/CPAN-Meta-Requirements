@@ -86,21 +86,26 @@ sub new {
 # from version::vpp
 sub _find_magic_vstring {
   my $value = shift;
-  my $tvalue = '';
-  require B;
-  my $sv = B::svref_2object(\$value);
-  my $magic = ref($sv) eq 'B::PVMG' ? $sv->MAGIC : undef;
-  while ( $magic ) {
-    if ( $magic->TYPE eq 'V' ) {
-      $tvalue = $magic->PTR;
-      $tvalue =~ s/^v?(.+)$/v$1/;
-      last;
-    }
-    else {
-      $magic = $magic->MOREMAGIC;
+  # B may not be available, such as under miniperl
+  if (eval { require B }) {
+    my $sv = B::svref_2object(\$value);
+    my $magic = ref($sv) eq 'B::PVMG' ? $sv->MAGIC : undef;
+    while ( $magic ) {
+      if ( $magic->TYPE eq 'V' ) {
+        my $tvalue = $magic->PTR;
+        $tvalue =~ s/^v?(.+)$/v$1/;
+        return $tvalue;
+        last;
+      }
+      else {
+        $magic = $magic->MOREMAGIC;
+      }
     }
   }
-  return $tvalue;
+  elsif ((ref \$value) eq 'VSTRING') {
+    return sprintf 'v%vd', $value;
+  }
+  return '';
 }
 
 # safe if given an unblessed reference
