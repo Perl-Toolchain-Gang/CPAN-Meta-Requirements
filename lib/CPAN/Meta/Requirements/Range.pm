@@ -31,6 +31,8 @@ exceptions.
 
 =cut
 
+use Carp ();
+
 package
   CPAN::Meta::Requirements::Range::_Base;
 
@@ -127,6 +129,82 @@ sub _version_object {
 
   return $vobj;
 }
+
+=method with_string_requirement
+
+  $req->with_string_requirement('>= 1.208, <= 2.206');
+  $req->with_string_requirement(v1.208);
+
+This method parses the passed in string and adds the appropriate requirement.
+A version can be a Perl "v-string".  It understands version ranges as described
+in the L<CPAN::Meta::Spec/Version Ranges>. For example:
+
+=over 4
+
+=item 1.3
+
+=item >= 1.3
+
+=item <= 1.3
+
+=item == 1.3
+
+=item != 1.3
+
+=item > 1.3
+
+=item < 1.3
+
+=item >= 1.3, != 1.5, <= 2.0
+
+A version number without an operator is equivalent to specifying a minimum
+(C<E<gt>=>).  Extra whitespace is allowed.
+
+=back
+
+=cut
+
+my %methods_for_op = (
+  '==' => [ qw(with_exact_version) ],
+  '!=' => [ qw(with_exclusion) ],
+  '>=' => [ qw(with_minimum)   ],
+  '<=' => [ qw(with_maximum)   ],
+  '>'  => [ qw(with_minimum with_exclusion) ],
+  '<'  => [ qw(with_maximum with_exclusion) ],
+);
+
+sub with_string_requirement {
+  my ($self, $req, $module, $bad_version_hook) = @_;
+  $module = 'module' unless defined $module;
+
+  unless ( defined $req && length $req ) {
+    $req = 0;
+    Carp::carp("Undefined requirement for $module treated as '0'");
+  }
+
+  my $magic = _find_magic_vstring( $req );
+  if (length $magic) {
+    return $self->with_minimum($magic, $module, $bad_version_hook);
+  }
+
+  my @parts = split qr{\s*,\s*}, $req;
+
+  for my $part (@parts) {
+    my ($op, $ver) = $part =~ m{\A\s*(==|>=|>|<=|<|!=)\s*(.*)\z};
+
+    if (! defined $op) {
+      return $self->with_minimum($part, $module, $bad_version_hook);
+    } else {
+      Carp::croak("illegal requirement string: $req")
+        unless my $methods = $methods_for_op{ $op };
+
+      $self = $self->$_($ver, $module, $bad_version_hook) for @$methods;
+    }
+  }
+
+  return $self;
+}
+
 
 package CPAN::Meta::Requirements::Range;
 
