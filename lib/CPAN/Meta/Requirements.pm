@@ -441,43 +441,10 @@ A version number without an operator is equivalent to specifying a minimum
 
 =cut
 
-my %methods_for_op = (
-  '==' => [ qw(exact_version) ],
-  '!=' => [ qw(add_exclusion) ],
-  '>=' => [ qw(add_minimum)   ],
-  '<=' => [ qw(add_maximum)   ],
-  '>'  => [ qw(add_minimum add_exclusion) ],
-  '<'  => [ qw(add_maximum add_exclusion) ],
-);
-
 sub add_string_requirement {
   my ($self, $module, $req) = @_;
 
-  unless ( defined $req && length $req ) {
-    $req = 0;
-    $self->_blank_carp($module);
-  }
-
-  my $magic = _find_magic_vstring( $req );
-  if (length $magic) {
-    $self->add_minimum($module => $magic);
-    return;
-  }
-
-  my @parts = split qr{\s*,\s*}, $req;
-
-  for my $part (@parts) {
-    my ($op, $ver) = $part =~ m{\A\s*(==|>=|>|<=|<|!=)\s*(.*)\z};
-
-    if (! defined $op) {
-      $self->add_minimum($module => $part);
-    } else {
-      Carp::croak("illegal requirement string: $req")
-        unless my $methods = $methods_for_op{ $op };
-
-      $self->$_($module => $ver) for @$methods;
-    }
-  }
+  $self->__modify_entry_for($module, 'with_string_requirement', $req);
 }
 
 =method from_string_hash
@@ -494,11 +461,6 @@ method.
 
 =cut
 
-sub _blank_carp {
-  my ($self, $module) = @_;
-  Carp::carp("Undefined requirement for $module treated as '0'");
-}
-
 sub from_string_hash {
   my ($class, $hash, $options) = @_;
 
@@ -506,10 +468,6 @@ sub from_string_hash {
 
   for my $module (keys %$hash) {
     my $req = $hash->{$module};
-    unless ( defined $req && length $req ) {
-      $req = 0;
-      $class->_blank_carp($module);
-    }
     $self->add_string_requirement($module, $req);
   }
 
