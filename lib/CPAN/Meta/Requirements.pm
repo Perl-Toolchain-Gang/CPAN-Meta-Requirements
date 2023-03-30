@@ -37,19 +37,6 @@ exceptions.
 
 use Carp ();
 
-BEGIN {
-  eval "use version ()"; ## no critic
-  if ( my $err = $@ ) {
-    eval "use ExtUtils::MakeMaker::version" or die $err; ## no critic
-  }
-}
-
-# Perl 5.10.0 didn't have "is_qv" in version.pm
-*_is_qv = version->can('is_qv') ? sub { $_[0]->is_qv } : sub { exists $_[0]->{qv} };
-
-# construct once, reuse many times
-my $V0 = version->new(0);
-
 =method new
 
   my $req = CPAN::Meta::Requirements->new;
@@ -77,82 +64,6 @@ sub new {
   my %self = map {; $_ => $options->{$_}} @valid_options;
 
   return bless \%self => $class;
-}
-
-# from version::vpp
-sub _find_magic_vstring {
-  my $value = shift;
-  my $tvalue = '';
-  require B;
-  my $sv = B::svref_2object(\$value);
-  my $magic = ref($sv) eq 'B::PVMG' ? $sv->MAGIC : undef;
-  while ( $magic ) {
-    if ( $magic->TYPE eq 'V' ) {
-      $tvalue = $magic->PTR;
-      $tvalue =~ s/^v?(.+)$/v$1/;
-      last;
-    }
-    else {
-      $magic = $magic->MOREMAGIC;
-    }
-  }
-  return $tvalue;
-}
-
-# safe if given an unblessed reference
-sub _isa_version {
-  UNIVERSAL::isa( $_[0], 'UNIVERSAL' ) && $_[0]->isa('version')
-}
-
-sub _version_object {
-  my ($self, $module, $version) = @_;
-
-  my ($vobj, $err);
-
-  if (not defined $version or (!ref($version) && $version eq '0')) {
-    return $V0;
-  }
-  elsif ( ref($version) eq 'version' || ( ref($version) && _isa_version($version) ) ) {
-    $vobj = $version;
-  }
-  else {
-    # hack around version::vpp not handling <3 character vstring literals
-    if ( $INC{'version/vpp.pm'} || $INC{'ExtUtils/MakeMaker/version/vpp.pm'} ) {
-      my $magic = _find_magic_vstring( $version );
-      $version = $magic if length $magic;
-    }
-    # pad to 3 characters if before 5.8.1 and appears to be a v-string
-    if ( $] < 5.008001 && $version !~ /\A[0-9]/ && substr($version,0,1) ne 'v' && length($version) < 3 ) {
-      $version .= "\0" x (3 - length($version));
-    }
-    eval {
-      local $SIG{__WARN__} = sub { die "Invalid version: $_[0]" };
-      # avoid specific segfault on some older version.pm versions
-      die "Invalid version: $version" if $version eq 'version';
-      $vobj = version->new($version);
-    };
-    if ( my $err = $@ ) {
-      my $hook = $self->{bad_version_hook};
-      $vobj = eval { $hook->($version, $module) }
-        if ref $hook eq 'CODE';
-      unless (eval { $vobj->isa("version") }) {
-        $err =~ s{ at .* line \d+.*$}{};
-        die "Can't convert '$version': $err";
-      }
-    }
-  }
-
-  # ensure no leading '.'
-  if ( $vobj =~ m{\A\.} ) {
-    $vobj = version->new("0$vobj");
-  }
-
-  # ensure normal v-string form
-  if ( _is_qv($vobj) ) {
-    $vobj = version->new($vobj->normal);
-  }
-
-  return $vobj;
 }
 
 =method add_minimum
@@ -215,8 +126,6 @@ BEGIN {
     my $code = sub {
       my ($self, $name, $version) = @_;
 
-      $version = $self->_version_object( $name, $version );
-
       $self->__modify_entry_for($name, $method, $version);
 
       return $self;
@@ -240,11 +149,9 @@ sub add_minimum {
       if $self->is_finalized;
 
     $self->{requirements}{ $name } =
-      CPAN::Meta::Requirements::Range->with_minimum($V0, $name);
+      CPAN::Meta::Requirements::Range->with_minimum('0', $name);
   }
   else {
-    $version = $self->_version_object( $name, $version );
-
     $self->__modify_entry_for($name, 'with_minimum', $version);
   }
   return $self;
@@ -306,8 +213,6 @@ true.
 
 sub accepts_module {
   my ($self, $module, $version) = @_;
-
-  $version = $self->_version_object( $module, $version );
 
   return 1 unless my $range = $self->__entry_for($module);
   return $range->accepts($version);
@@ -411,7 +316,7 @@ sub __modify_entry_for {
     if $fin and not $old;
 
   my $new = ($old || 'CPAN::Meta::Requirements::Range')
-          ->$method($version, $name);
+          ->$method($version, $name, $self->{bad_version_hook});
 
   Carp::croak("can't modify finalized requirements")
     if $fin and $old->as_string ne $new->as_string;

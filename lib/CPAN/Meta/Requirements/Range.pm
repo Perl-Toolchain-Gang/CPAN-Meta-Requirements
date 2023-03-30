@@ -31,6 +31,9 @@ exceptions.
 
 =cut
 
+package
+  CPAN::Meta::Requirements::Range::_Base;
+
 # To help ExtUtils::MakeMaker bootstrap CPAN::Meta::Requirements on perls
 # before 5.10, we fall back to the EUMM bundled compatibility version module if
 # that's the only thing available.  This shouldn't ever happen in a normal CPAN
@@ -43,6 +46,91 @@ BEGIN {
     eval "use ExtUtils::MakeMaker::version" or die $err; ## no critic
   }
 }
+
+# from version::vpp
+sub _find_magic_vstring {
+  my $value = shift;
+  my $tvalue = '';
+  require B;
+  my $sv = B::svref_2object(\$value);
+  my $magic = ref($sv) eq 'B::PVMG' ? $sv->MAGIC : undef;
+  while ( $magic ) {
+    if ( $magic->TYPE eq 'V' ) {
+      $tvalue = $magic->PTR;
+      $tvalue =~ s/^v?(.+)$/v$1/;
+      last;
+    }
+    else {
+      $magic = $magic->MOREMAGIC;
+    }
+  }
+  return $tvalue;
+}
+
+# Perl 5.10.0 didn't have "is_qv" in version.pm
+*_is_qv = version->can('is_qv') ? sub { $_[0]->is_qv } : sub { exists $_[0]->{qv} };
+
+# construct once, reuse many times
+my $V0 = version->new(0);
+
+# safe if given an unblessed reference
+sub _isa_version {
+  UNIVERSAL::isa( $_[0], 'UNIVERSAL' ) && $_[0]->isa('version')
+}
+
+sub _version_object {
+  my ($self, $version, $module, $bad_version_hook) = @_;
+
+  my ($vobj, $err);
+
+  if (not defined $version or (!ref($version) && $version eq '0')) {
+    return $V0;
+  }
+  elsif ( ref($version) eq 'version' || ( ref($version) && _isa_version($version) ) ) {
+    $vobj = $version;
+  }
+  else {
+    # hack around version::vpp not handling <3 character vstring literals
+    if ( $INC{'version/vpp.pm'} || $INC{'ExtUtils/MakeMaker/version/vpp.pm'} ) {
+      my $magic = _find_magic_vstring( $version );
+      $version = $magic if length $magic;
+    }
+    # pad to 3 characters if before 5.8.1 and appears to be a v-string
+    if ( $] < 5.008001 && $version !~ /\A[0-9]/ && substr($version,0,1) ne 'v' && length($version) < 3 ) {
+      $version .= "\0" x (3 - length($version));
+    }
+    eval {
+      local $SIG{__WARN__} = sub { die "Invalid version: $_[0]" };
+      # avoid specific segfault on some older version.pm versions
+      die "Invalid version: $version" if $version eq 'version';
+      $vobj = version->new($version);
+    };
+    if ( my $err = $@ ) {
+      $vobj = eval { $bad_version_hook->($version, $module) }
+        if ref $bad_version_hook eq 'CODE';
+      unless (eval { $vobj->isa("version") }) {
+        $err =~ s{ at .* line \d+.*$}{};
+        die "Can't convert '$version': $err";
+      }
+    }
+  }
+
+  # ensure no leading '.'
+  if ( $vobj =~ m{\A\.} ) {
+    $vobj = version->new("0$vobj");
+  }
+
+  # ensure normal v-string form
+  if ( _is_qv($vobj) ) {
+    $vobj = version->new($vobj->normal);
+  }
+
+  return $vobj;
+}
+
+package CPAN::Meta::Requirements::Range;
+
+our @ISA = 'CPAN::Meta::Requirements::Range::_Base';
 
 sub _clone {
   return (bless { } => $_[0]) unless ref $_[0];
@@ -72,9 +160,10 @@ This method returns the version range object.
 =cut
 
 sub with_exact_version {
-  my ($self, $version, $module) = @_;
+  my ($self, $version, $module, $bad_version_hook) = @_;
   $module = 'module' unless defined $module;
   $self = $self->_clone;
+  $version = $self->_version_object($version, $module, $bad_version_hook);
 
   unless ($self->accepts($version)) {
     $self->_reject_requirements(
@@ -139,9 +228,10 @@ This method returns the version range object.
 =cut
 
 sub with_minimum {
-  my ($self, $minimum, $module) = @_;
+  my ($self, $minimum, $module, $bad_version_hook) = @_;
   $module = 'module' unless defined $module;
   $self = $self->_clone;
+  $minimum = $self->_version_object( $minimum, $module, $bad_version_hook );
 
   if (defined (my $old_min = $self->{minimum})) {
     $self->{minimum} = (sort { $b cmp $a } ($minimum, $old_min))[0];
@@ -167,9 +257,10 @@ This method returns the version range object.
 =cut
 
 sub with_maximum {
-  my ($self, $maximum, $module) = @_;
+  my ($self, $maximum, $module, $bad_version_hook) = @_;
   $module = 'module' unless defined $module;
   $self = $self->_clone;
+  $maximum = $self->_version_object( $maximum, $module, $bad_version_hook );
 
   if (defined (my $old_max = $self->{maximum})) {
     $self->{maximum} = (sort { $a cmp $b } ($maximum, $old_max))[0];
@@ -200,9 +291,10 @@ This method returns the requirements object.
 =cut
 
 sub with_exclusion {
-  my ($self, $exclusion, $module) = @_;
+  my ($self, $exclusion, $module, $bad_version_hook) = @_;
   $module = 'module' unless defined $module;
   $self = $self->_clone;
+  $exclusion = $self->_version_object( $exclusion, $module, $bad_version_hook );
 
   push @{ $self->{exclusions} ||= [] }, $exclusion;
 
@@ -310,6 +402,17 @@ sub accepts {
 package
   CPAN::Meta::Requirements::Range::_Exact;
 
+our @ISA = 'CPAN::Meta::Requirements::Range::_Base';
+
+our $VERSION = '2.141';
+
+BEGIN {
+  eval "use version ()"; ## no critic
+  if ( my $err = $@ ) {
+    eval "use ExtUtils::MakeMaker::version" or die $err; ## no critic
+  }
+}
+
 sub _new      { bless { version => $_[1] } => $_[0] }
 
 sub accepts { return $_[0]{version} == $_[1] }
@@ -324,8 +427,9 @@ sub _clone {
 }
 
 sub with_exact_version {
-  my ($self, $version, $module) = @_;
+  my ($self, $version, $module, $bad_version_hook) = @_;
   $module = 'module' unless defined $module;
+  $version = $self->_version_object($version, $module, $bad_version_hook);
 
   return $self->_clone if $self->accepts($version);
 
@@ -336,8 +440,9 @@ sub with_exact_version {
 }
 
 sub with_minimum {
-  my ($self, $minimum, $module) = @_;
+  my ($self, $minimum, $module, $bad_version_hook) = @_;
   $module = 'module' unless defined $module;
+  $minimum = $self->_version_object( $minimum, $module, $bad_version_hook );
 
   return $self->_clone if $self->{version} >= $minimum;
   $self->_reject_requirements(
@@ -347,8 +452,9 @@ sub with_minimum {
 }
 
 sub with_maximum {
-  my ($self, $maximum, $module) = @_;
+  my ($self, $maximum, $module, $bad_version_hook) = @_;
   $module = 'module' unless defined $module;
+  $maximum = $self->_version_object( $maximum, $module, $bad_version_hook );
 
   return $self->_clone if $self->{version} <= $maximum;
   $self->_reject_requirements(
@@ -358,8 +464,9 @@ sub with_maximum {
 }
 
 sub with_exclusion {
-  my ($self, $exclusion, $module) = @_;
+  my ($self, $exclusion, $module, $bad_version_hook) = @_;
   $module = 'module' unless defined $module;
+  $exclusion = $self->_version_object( $exclusion, $module, $bad_version_hook );
 
   return $self->_clone unless $exclusion == $self->{version};
   $self->_reject_requirements(
