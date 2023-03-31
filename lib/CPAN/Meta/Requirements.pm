@@ -184,11 +184,8 @@ sub add_requirements {
   my ($self, $req) = @_;
 
   for my $module ($req->required_modules) {
-    my $modifiers = $req->__entry_for($module)->_as_modifiers;
-    for my $modifier (@$modifiers) {
-      my ($method, @args) = @$modifier;
-      $self->$method($module => @args);
-    };
+    my $new_range = $req->version_range_for_module($module);
+    $self->__modify_entry_for($module, 'with_range', $new_range);
   }
 
   return $self;

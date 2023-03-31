@@ -205,6 +205,22 @@ sub with_string_requirement {
   return $self;
 }
 
+=method with_range
+
+ $range->with_range($other_range)
+
+This creates a new range object that is a merge two others.
+
+=cut
+
+sub with_range {
+  my ($self, $other, $module, $bad_version_hook) = @_;
+  for my $modifier($other->_as_modifiers) {
+    my ($method, $arg) = @$modifier;
+    $self = $self->$method($arg, $module, $bad_version_hook);
+  }
+  return $self;
+}
 
 package CPAN::Meta::Requirements::Range;
 
@@ -382,10 +398,10 @@ sub with_exclusion {
 sub _as_modifiers {
   my ($self) = @_;
   my @mods;
-  push @mods, [ add_minimum => $self->{minimum} ] if exists $self->{minimum};
-  push @mods, [ add_maximum => $self->{maximum} ] if exists $self->{maximum};
-  push @mods, map {; [ add_exclusion => $_ ] } @{$self->{exclusions} || []};
-  return \@mods;
+  push @mods, [ with_minimum => $self->{minimum} ] if exists $self->{minimum};
+  push @mods, [ with_maximum => $self->{maximum} ] if exists $self->{maximum};
+  push @mods, map {; [ with_exclusion => $_ ] } @{$self->{exclusions} || []};
+  return @mods;
 }
 
 =method as_struct
@@ -557,7 +573,7 @@ sub as_string { return "== $_[0]{version}" }
 
 sub as_struct { return [ [ '==', "$_[0]{version}" ] ] }
 
-sub _as_modifiers { return [ [ exact_version => $_[0]{version} ] ] }
+sub _as_modifiers { return [ with_exact_version => $_[0]{version} ] }
 
 
 1;
