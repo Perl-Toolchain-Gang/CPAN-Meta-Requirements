@@ -250,6 +250,17 @@ sub add_minimum {
   return $self;
 }
 
+=method version_range_for_module
+
+  $req->version_range_for_module( $another_req_object );
+
+=cut
+
+sub version_range_for_module {
+  my ($self, $module) = @_;
+  return $self->{requirements}{$module};
+}
+
 =method add_requirements
 
   $req->add_requirements( $another_req_object );
