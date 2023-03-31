@@ -493,6 +493,21 @@ sub accepts {
   return 1;
 }
 
+=method is_simple
+
+This method returns true if and only if the range is an inclusive minimum
+-- that is, if their string expression is just the version number.
+
+=cut
+
+sub is_simple {
+  my ($self) = @_;
+  # XXX: This is a complete hack, but also entirely correct.
+  return if $self->as_string =~ /\s/;
+
+  return 1;
+}
+
 package
   CPAN::Meta::Requirements::Range::_Exact;
 

@@ -332,7 +332,7 @@ sub is_simple {
   my ($self) = @_;
   for my $module ($self->required_modules) {
     # XXX: This is a complete hack, but also entirely correct.
-    return if $self->__entry_for($module)->as_string =~ /\s/;
+    return if not $self->__entry_for($module)->is_simple;
   }
 
   return 1;
