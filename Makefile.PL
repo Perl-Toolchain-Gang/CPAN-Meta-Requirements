@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010000;
 
 use ExtUtils::MakeMaker 6.17;
 
@@ -13,7 +13,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "CPAN-Meta-Requirements",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "CPAN::Meta::Requirements",
   "PREREQ_PM" => {
     "B" => 0,
