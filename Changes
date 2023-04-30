@@ -1,6 +1,7 @@
 Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
+    - confess() replaced with croak(): fewer stack traces
 
 2.140     2015-12-12 16:17:15-05:00 America/New_York
 
