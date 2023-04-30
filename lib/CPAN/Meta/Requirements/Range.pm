@@ -175,7 +175,7 @@ my %methods_for_op = (
 
 sub with_string_requirement {
   my ($self, $req, $module, $bad_version_hook) = @_;
-  $module = 'module' unless defined $module;
+  $module //= 'module';
 
   unless ( defined $req && length $req ) {
     $req = 0;
@@ -255,7 +255,7 @@ This method returns the version range object.
 
 sub with_exact_version {
   my ($self, $version, $module, $bad_version_hook) = @_;
-  $module = 'module' unless defined $module;
+  $module //= 'module';
   $self = $self->_clone;
   $version = $self->_version_object($version, $module, $bad_version_hook);
 
@@ -323,7 +323,7 @@ This method returns the version range object.
 
 sub with_minimum {
   my ($self, $minimum, $module, $bad_version_hook) = @_;
-  $module = 'module' unless defined $module;
+  $module //= 'module';
   $self = $self->_clone;
   $minimum = $self->_version_object( $minimum, $module, $bad_version_hook );
 
@@ -352,7 +352,7 @@ This method returns the version range object.
 
 sub with_maximum {
   my ($self, $maximum, $module, $bad_version_hook) = @_;
-  $module = 'module' unless defined $module;
+  $module //= 'module';
   $self = $self->_clone;
   $maximum = $self->_version_object( $maximum, $module, $bad_version_hook );
 
@@ -386,7 +386,7 @@ This method returns the requirements object.
 
 sub with_exclusion {
   my ($self, $exclusion, $module, $bad_version_hook) = @_;
-  $module = 'module' unless defined $module;
+  $module //= 'module';
   $self = $self->_clone;
   $exclusion = $self->_version_object( $exclusion, $module, $bad_version_hook );
 
@@ -537,7 +537,7 @@ sub _clone {
 
 sub with_exact_version {
   my ($self, $version, $module, $bad_version_hook) = @_;
-  $module = 'module' unless defined $module;
+  $module //= 'module';
   $version = $self->_version_object($version, $module, $bad_version_hook);
 
   return $self->_clone if $self->accepts($version);
@@ -550,7 +550,7 @@ sub with_exact_version {
 
 sub with_minimum {
   my ($self, $minimum, $module, $bad_version_hook) = @_;
-  $module = 'module' unless defined $module;
+  $module //= 'module';
   $minimum = $self->_version_object( $minimum, $module, $bad_version_hook );
 
   return $self->_clone if $self->{version} >= $minimum;
@@ -562,7 +562,7 @@ sub with_minimum {
 
 sub with_maximum {
   my ($self, $maximum, $module, $bad_version_hook) = @_;
-  $module = 'module' unless defined $module;
+  $module //= 'module';
   $maximum = $self->_version_object( $maximum, $module, $bad_version_hook );
 
   return $self->_clone if $self->{version} <= $maximum;
@@ -574,7 +574,7 @@ sub with_maximum {
 
 sub with_exclusion {
   my ($self, $exclusion, $module, $bad_version_hook) = @_;
-  $module = 'module' unless defined $module;
+  $module //= 'module';
   $exclusion = $self->_version_object( $exclusion, $module, $bad_version_hook );
 
   return $self->_clone unless $exclusion == $self->{version};
