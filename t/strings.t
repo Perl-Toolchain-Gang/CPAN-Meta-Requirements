@@ -46,10 +46,10 @@ ok($range->accepts('1.2'), 'lower version (<=)');
 ok(!$range->accepts('1.4'), 'higher version (<=)');
 
 # Test ""
-$range = $base->with_string_requirement('>= 1.3');
-ok($range->accepts('1.3'), 'exact version (>=)');
-ok(!$range->accepts('1.2'), 'lower version (>=)');
-ok($range->accepts('1.4'), 'higher version (>=)');
+$range = $base->with_string_requirement('1.3');
+ok($range->accepts('1.3'), 'exact version ("")');
+ok(!$range->accepts('1.2'), 'lower version ("")');
+ok($range->accepts('1.4'), 'higher version ("")');
 
 # Test multiple requirements
 $range = $base->with_string_requirement('>= 1.3, <= 2.0, != 1.6');
@@ -57,7 +57,6 @@ ok($range->accepts('1.5'), 'middle version (>=, <=, !)');
 ok(!$range->accepts('1.2'), 'lower version (>=, <=, !)');
 ok(!$range->accepts('2.1'), 'higher version (>=, <=, !)');
 ok(!$range->accepts('1.6'), 'excluded version (>=, <=, !)');
-
 
 my $req = CPAN::Meta::Requirements->new;
 
@@ -86,10 +85,10 @@ ok($req->accepts_module('Foo::Graz' => '1.2'), 'lower version (<=)');
 ok(!$req->accepts_module('Foo::Graz' => '1.4'), 'higher version (<=)');
 
 # Test ""
-$req->add_string_requirement('Foo::Blurb', '>= 1.3');
-ok($req->accepts_module('Foo::Blurb' => '1.3'), 'exact version (>=)');
-ok(!$req->accepts_module('Foo::Blurb' => '1.2'), 'lower version (>=)');
-ok($req->accepts_module('Foo::Blurb' => '1.4'), 'higher version (>=)');
+$req->add_string_requirement('Foo::Blurb', '1.3');
+ok($req->accepts_module('Foo::Blurb' => '1.3'), 'exact version ("")');
+ok(!$req->accepts_module('Foo::Blurb' => '1.2'), 'lower version ("")');
+ok($req->accepts_module('Foo::Blurb' => '1.4'), 'higher version ("")');
 
 # Test multiple requirements
 $req->add_string_requirement('A::Tribe::Called', '>= 1.3, <= 2.0, != 1.6');
