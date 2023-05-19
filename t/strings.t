@@ -58,6 +58,14 @@ ok(!$range->accepts('1.2'), 'lower version (>=, <=, !)');
 ok(!$range->accepts('2.1'), 'higher version (>=, <=, !)');
 ok(!$range->accepts('1.6'), 'excluded version (>=, <=, !)');
 
+# Test multiple requirements with implicit minimum
+$range = $base->with_string_requirement('0.90, != 0.91');
+ok(!$range->accepts('0.88'), 'lower version ("", !)');
+ok($range->accepts('0.90'), 'exact version ("", !)');
+ok($range->accepts('0.901'), 'middle version ("", !)');
+ok(!$range->accepts('0.91'), 'excluded version ("", !)');
+ok($range->accepts('0.92'), 'higher version ("", !)');
+
 my $req = CPAN::Meta::Requirements->new;
 
 # Test ==
@@ -96,6 +104,21 @@ ok($req->accepts_module('A::Tribe::Called' => '1.5'), 'middle version (>=, <=, !
 ok(!$req->accepts_module('A::Tribe::Called' => '1.2'), 'lower version (>=, <=, !)');
 ok(!$req->accepts_module('A::Tribe::Called' => '2.1'), 'higher version (>=, <=, !)');
 ok(!$req->accepts_module('A::Tribe::Called' => '1.6'), 'excluded version (>=, <=, !)');
+
+# Test multiple requirements with implicit minimum
+{
+  my $req = CPAN::Meta::Requirements->new;
+
+  $req->add_string_requirement('Foo::MyModule', '0.90, != 0.91');
+
+  is_deeply(
+    $req->as_string_hash,
+    {
+      'Foo::MyModule' => '>= 0.90, != 0.91'
+    },
+    "multiple requirements with implicit minimum",
+  );
+}
 
 # Test precision
 {
