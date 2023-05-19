@@ -193,7 +193,7 @@ sub with_string_requirement {
     my ($op, $ver) = $part =~ m{\A\s*(==|>=|>|<=|<|!=)\s*(.*)\z};
 
     if (! defined $op) {
-      return $self->with_minimum($part, $module, $bad_version_hook);
+      $self = $self->with_minimum($part, $module, $bad_version_hook);
     } else {
       Carp::croak("illegal requirement string: $req")
         unless my $methods = $methods_for_op{ $op };
