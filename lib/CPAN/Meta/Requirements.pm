@@ -4,7 +4,7 @@ use warnings;
 package CPAN::Meta::Requirements;
 # ABSTRACT: a set of version requirements for a CPAN dist
 
-our $VERSION = '2.143';
+our $VERSION = '2.144';
 
 use CPAN::Meta::Requirements::Range;
 

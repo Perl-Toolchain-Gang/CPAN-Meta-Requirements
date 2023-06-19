@@ -1,6 +1,8 @@
 Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
+
+2.143     2023-06-19 14:51:58-04:00 America/New_York
     - Fix regression with implicit minimum value and multiple requirements
 
 2.142     2023-05-09 07:15:05-04:00 America/New_York
