@@ -271,4 +271,9 @@ sub foo_1 {
 
 }
 
+{
+	my $r = CPAN::Meta::Requirements::Range->with_string_requirement(">= 0, < 2");
+	is($r->as_string, '< 2', ">= 0 is filtered out when there's a maximum defined");
+}
+
 done_testing;
