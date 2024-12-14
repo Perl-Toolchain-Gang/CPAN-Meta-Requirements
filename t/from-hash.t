@@ -43,7 +43,7 @@ for my $string (10, '>= 2, <= 9, != 7') {
 
 SKIP: {
   skip "Can't tell v-strings from strings until 5.8.1", 1
-    unless $] gt '5.008';
+    unless $] > 5.008;
   my $string_hash = {
     Left   => 10,
     Shared => '= 2',
@@ -87,7 +87,7 @@ SKIP: {
 
 SKIP: {
   skip "Can't tell v-strings from strings until 5.8.1", 2
-    unless $] gt '5.008';
+    unless $] > 5.008;
   my $string_hash = {
     Left   => 10,
     Shared => v50.44.60,
