@@ -97,10 +97,6 @@ sub _version_object {
       my $magic = _find_magic_vstring( $version );
       $version = $magic if length $magic;
     }
-    # pad to 3 characters if before 5.8.1 and appears to be a v-string
-    if ( $] < 5.008001 && $version !~ /\A[0-9]/ && substr($version,0,1) ne 'v' && length($version) < 3 ) {
-      $version .= "\0" x (3 - length($version));
-    }
     eval {
       local $SIG{__WARN__} = sub { die "Invalid version: $_[0]" };
       # avoid specific segfault on some older version.pm versions
