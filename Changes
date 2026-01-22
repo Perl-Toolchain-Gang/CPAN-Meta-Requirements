@@ -1,6 +1,9 @@
 Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
+    - Remove code meant to cope with running on v5.8, when v5.10 is the minimum
+      required perl!
+    - Normalize away ">= 0" in compount version requirements, it's meaningless.
 
 2.143     2023-06-19 14:51:58-04:00 America/New_York
     - Fix regression with implicit minimum value and multiple requirements
