@@ -276,4 +276,9 @@ sub foo_1 {
 	is($r->as_string, '< 2', ">= 0 is filtered out when there's a maximum defined");
 }
 
+{
+	my $r = CPAN::Meta::Requirements::Range->with_string_requirement(">= 0");
+	is($r->as_string, '0', ">= 0 becomes a plain old '0' when alone");
+}
+
 done_testing;
