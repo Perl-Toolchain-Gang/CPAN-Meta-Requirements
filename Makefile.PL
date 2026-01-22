@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker 6.17;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "a set of version requirements for a CPAN dist",
-  "AUTHOR" => "David Golden <dagolden\@cpan.org>, Ricardo Signes <rjbs\@cpan.org>",
+  "AUTHOR" => "David Golden <dagolden\@cpan.org>, Ricardo Signes <cpan\@semiotic.systems>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.17"
   },
