@@ -1,6 +1,8 @@
 Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
+    - Correct "normalization of 0" code to work correctly with vstrings
+      (thanks, Graham Knop!)
 
 2.144     2026-01-22 16:12:20-05:00 America/New_York
     - Remove code meant to cope with running on v5.8, when v5.10 is the minimum
