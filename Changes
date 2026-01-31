@@ -1,6 +1,8 @@
 Revision history for CPAN-Meta-Requirements
 
 {{$NEXT}}
+
+2.145     2026-01-31 12:17:04+01:00 Europe/Brussels
     - Correct "normalization of 0" code to work correctly with vstrings
       (thanks, Graham Knop!)
 
